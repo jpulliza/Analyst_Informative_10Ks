@@ -4,7 +4,7 @@ import re
 
 import logging
 
-logging.basicConfig(filename='sentence_parser.log', level=logging.INFO)
+logging.basicConfig(filename='general_log.log', level=logging.INFO)
 
 
 def parse_sentences(textfile):
@@ -37,5 +37,5 @@ def parse_sentences(textfile):
         logging.info("Sentence Parser Complete: {0}".format(textfile))
         return sentences
     except Exception:
-        logging.error("Sentence Parser Error".format(textfile))
+        logging.error("Sentence Parser Error: {0}".format(textfile))
         pass
