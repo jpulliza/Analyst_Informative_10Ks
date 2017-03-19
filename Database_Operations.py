@@ -1,6 +1,9 @@
 import dataset
 from List_10K_Files import list_10k_files
 from Sentence_Parse import parse_sentences
+import logging
+
+logging.basicConfig(filename='general_log.log', level=logging.INFO)
 
 db = dataset.connect('sqlite:////media/windows-share/SEC_Downloads/10K_Sentences.db')
 
@@ -17,7 +20,8 @@ for i in range(len(file_locations)):
                               filing_year=filing_years[i],
                               sentence=sentence))
         db.commit()
+        logging.info("DB Loaded {ticker} - {filing_year}".format(tickers[i], filing_years[i]))
     except Exception:
-        print("DB Loading Error: {0}").format(file_locations[i])
+        logging.error("DB Loading Error: {0}").format(file_locations[i])
         db.rollback()
         pass
