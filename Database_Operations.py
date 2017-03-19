@@ -20,8 +20,10 @@ for i in range(len(file_locations)):
                               filing_year=filing_years[i],
                               sentence=sentence))
         db.commit()
-        logging.info("DB Loaded {ticker} - {filing_year}".format(tickers[i], filing_years[i]))
+        logging.info("DB Loaded {0} - {1}".format(tickers[i], filing_years[i]))
     except Exception:
-        logging.error("DB Loading Error: {0}").format(file_locations[i])
+        logging.error("DB Error {0} - {1}".format(tickers[i], filing_years[i]))
         db.rollback()
         pass
+    finally:
+        i += 1
