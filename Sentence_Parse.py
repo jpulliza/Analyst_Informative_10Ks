@@ -2,6 +2,10 @@ from textblob import TextBlob
 from bs4 import BeautifulSoup
 import re
 
+import logging
+
+logging.basicConfig(filename='sentence_parser.log', level=logging.INFO)
+
 
 def parse_sentences(textfile):
     f = open(textfile, 'r')
@@ -30,7 +34,8 @@ def parse_sentences(textfile):
             sentence_words = ' '.join(sentence_words.split())
             if len(sentence_words.split(" ")) > 3:
                 sentences.append(sentence_words)
+        logging.info("Sentence Parser Complete: {0}".format(textfile))
         return sentences
     except Exception:
-        print("Sentence Parse Error: {0}").format(textfile)
+        logging.error("Sentence Parser Error".format(textfile))
         pass
