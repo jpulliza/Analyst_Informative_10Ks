@@ -45,12 +45,12 @@ def compare_single_sentence(new_sentence, old_sentences):
     return results
 
 
-def server_run_similarities(year, ticker):
+def server_run_similarities(year, ticker, new_sentences_complete, old_sentences_complete):
     start_time = time.time()
     rows = []
-    new_sentences_complete = pull_sentences_by_year(year)
-    old_sentences_complete = pull_sentences_by_year(year-1)
+
     old_sentences = [x for x in old_sentences_complete if x['ticker'] == ticker]
+
     if len(old_sentences) > 0:
         for new_sentence in [x for x in new_sentences_complete if x['ticker'] == ticker]:
             rows.append(compare_single_sentence(new_sentence, old_sentences))
@@ -65,10 +65,15 @@ def server_run_similarities(year, ticker):
 if __name__ == '__main__':
     year = 2015
     filename = 'similarities_{0}.csv'.format(year)
+
+    new_sentences_complete = pull_sentences_by_year(year)
+    old_sentences_complete = pull_sentences_by_year(year - 1)
+
     with open(filename, 'w') as f:
         writer = csv.DictWriter(f, fieldnames=similarity_headers)
         writer.writeheader()
-        ticker_list = pull_tickers_by_year(year)[-3:]
-        #ticker_list = [{'ticker': 'ZQK'}, {'ticker': 'JNJ'}, {'ticker': 'JNJ'}]
+        ticker_list = pull_tickers_by_year(year)[-1:]
+        # ticker_list = [{'ticker': 'ZQK'}, {'ticker': 'JNJ'}, {'ticker': 'ZQK'}, {'ticker': 'JNJ'}]
         for ticker in ticker_list:
-            writer.writerows(server_run_similarities(year, ticker['ticker']))
+            writer.writerows(server_run_similarities(year, ticker['ticker'],
+                                                     new_sentences_complete, old_sentences_complete))
