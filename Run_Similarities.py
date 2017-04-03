@@ -1,17 +1,14 @@
-from mapping_functions import chunks
 import time
 from fuzzywuzzy.StringMatcher import StringMatcher
-import dataset
 from datetime import datetime
 import logging
 import csv
 
 logging.basicConfig(filename='general_log.log', level=logging.INFO)
-db = dataset.connect('sqlite:////media/windows-share/SEC_Downloads/Sentence_DB_Server.db')
-# db = dataset.connect('sqlite:////home/jpp156/Sentence_DB_Server.db')
 
 summary_directory = "/media/windows-share/SEC_Downloads/Document_Summary/"
 similarity_headers = ['sentence_id', 'old_sentence_id', 'max_score', 'sentence_length']
+
 
 def pull_tickers_by_year(filing_year):
     results = []
@@ -33,20 +30,6 @@ def pull_sentences_by_year(filing_year):
     return results
 
 
-def pull_filings_by_year_and_ticker(filing_year, ticker):
-    table_name = 'Sentences' + str(filing_year)
-    table = db[table_name]
-    result = table.find(ticker=ticker)
-    return result
-
-
-def chunk_list(input_list, number_of_chunks):
-    return_list = []
-    for chunk in chunks(input_list, len(input_list) / number_of_chunks):
-        return_list.append(chunk)
-    return return_list
-
-
 def compare_single_sentence(new_sentence, old_sentences):
     max_score = 0
     old_sentence_id = ''
@@ -56,8 +39,7 @@ def compare_single_sentence(new_sentence, old_sentences):
             old_sentence_id = old_sentence['id']
         if max_score == 1:
             break
-    results = dict(sentence_id=new_sentence['id'], old_sentence_id=old_sentence_id,
-                     max_score=max_score, sentence_length=len(new_sentence['sentence'].split(" ")))
+    results = dict(sentence_id=new_sentence['id'], old_sentence_id=old_sentence_id, max_score=max_score, sentence_length=len(new_sentence['sentence'].split(" ")))
     return results
 
 
