@@ -72,7 +72,7 @@ if __name__ == '__main__':
     with open(filename, 'w') as f:
         writer = csv.DictWriter(f, fieldnames=similarity_headers)
         writer.writeheader()
-        ticker_list = pull_tickers_by_year(year)[-1:]
+        ticker_list = pull_tickers_by_year(year)
         # ticker_list = [{'ticker': 'ZQK'}, {'ticker': 'JNJ'}, {'ticker': 'ZQK'}, {'ticker': 'JNJ'}]
         for ticker in ticker_list:
             writer.writerows(server_run_similarities(year, ticker['ticker'],
