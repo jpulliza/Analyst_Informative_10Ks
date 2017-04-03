@@ -1,26 +1,37 @@
-from Sentence_Parse import parse_sentences
-
 from fuzzywuzzy import fuzz
+import time
 
-import csv
 
-text_file1 = '/media/windows-share/SEC_Downloads/ABT/1800/10-K/0001047469-08-001480.txt'
-text_file2 = '/media/windows-share/SEC_Downloads/ABT/1800/10-K/0001047469-09-001642.txt'
-
-sentences1 = sorted(parse_sentences(text_file1)) # add an index first so you know the sentence order
-sentences2 = sorted(parse_sentences(text_file2)) # add an index first so you know the sentence order
-max_scores = []
-
-with open('test.csv', 'w') as csvfile:
-    writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
-    i = 0
-    for new_sentence in sentences2:
+def compare_sentences(new_sentences, old_sentences):
+    start = time.time()
+    old_sentences = sorted(old_sentences)
+    rows = []
+    for new_sentence, sentence_id in new_sentences:
         max_score = 0
-        for old_sentence in sentences1:
+        for old_sentence in old_sentences:
             if fuzz.token_sort_ratio(new_sentence, old_sentence) > max_score:
                 max_score = fuzz.token_sort_ratio(new_sentence, old_sentence)
             if max_score == 100:
                 break
-        i += 1
-        writer.writerow([max_score, new_sentence])
-        print(len(sentences2)-i)
+        compare_dict = dict(sentence_id=sentence_id, max_score=max_score, sentence_length=len(new_sentence.split(" ")))
+        rows.append(compare_dict)
+    end = time.time()
+    print(end-start)
+    return rows
+
+
+def compare_single_sentence(new_sentence, new_sentence_id, old_sentences):
+    start_time = time.time()
+    rows = []
+    max_score = 0
+    for old_sentence in old_sentences:
+        if fuzz.token_sort_ratio(new_sentence, old_sentence) > max_score:
+            max_score = fuzz.token_sort_ratio(new_sentence, old_sentence)
+        if max_score == 100:
+            break
+    compare_dict = dict(sentence_id=new_sentence_id, max_score=max_score, sentence_length=len(new_sentence.split(" ")))
+    print compare_dict
+    rows.append(compare_dict)
+    end_time = time.time()
+    print(end_time-start_time)
+    return rows

@@ -4,7 +4,7 @@ import logging
 
 logging.basicConfig(filename='general_log.log', level=logging.INFO)
 
-db = dataset.connect('sqlite:////media/windows-share/SEC_Downloads/10K_Sentences.db')
+db = dataset.connect('sqlite:////media/windows-share/SEC_Downloads/Sentence_DB_Server.db')
 
 
 def record_sentences(filing_id, ticker, filing_year, file_location):
@@ -67,3 +67,28 @@ def record_sentences_by_year(filing_id, ticker, filing_year, file_location):
         logging.error("DB Error Sentences By Year {0} - {1} - {2} - {3}".format(filing_id, ticker, filing_year, file_location))
         db.rollback()
         pass
+
+
+def pull_filings_by_year_and_ticker(filing_year, ticker):
+    table_name = 'Sentences' + str(filing_year)
+    table = db[table_name]
+    return table.find(ticker=ticker)
+
+
+def pull_sentence_by_year_and_id(filing_year, id):
+    table_name = 'Sentences' + filing_year
+    table = db[table_name]
+    return table.find_one(id=id)
+
+
+def pull_tickers_by_year(filing_year):
+    query = 'SELECT ticker FROM Tickers_{0} ORDER BY ticker'.format(filing_year)
+    results = db.query(query)
+    return results
+
+
+def pull_sentences_by_year(filing_year):
+    table_name = 'Sentences' + str(filing_year)
+    table = db[table_name]
+    return table
+

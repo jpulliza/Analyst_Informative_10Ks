@@ -7,6 +7,8 @@ import csv
 logging.basicConfig(filename='general_log.log', level=logging.INFO)
 
 summary_directory = "/media/windows-share/SEC_Downloads/Document_Summary/"
+#summary_directory = "/home/jpp156/Document_Summary/"
+
 similarity_headers = ['sentence_id', 'old_sentence_id', 'max_score', 'sentence_length']
 
 
@@ -43,22 +45,21 @@ def compare_single_sentence(new_sentence, old_sentences):
     return results
 
 
-def server_run_similarities(year, tickers):
+def server_run_similarities(year, ticker):
     start_time = time.time()
     rows = []
     new_sentences_complete = pull_sentences_by_year(year)
     old_sentences_complete = pull_sentences_by_year(year-1)
-    for ticker in tickers:
-        old_sentences = [x for x in old_sentences_complete if x['ticker'] == ticker]
-        if len(old_sentences) > 0:
-            for new_sentence in [x for x in new_sentences_complete if x['ticker'] == ticker]:
-                rows.append(compare_single_sentence(new_sentence, old_sentences))
-            logging.info("Similarities {0} complete for {1} - {2}".format(year, ticker, datetime.now()))
-        else:
-            print("No {0} sentences for {1}".format(year - 1, ticker))
-            logging.info("No {0} sentences for {1} - {2}".format(year - 1, ticker, datetime.now()))
-        end_time = time.time()
-        print('{0} - {1} complete - {2}'.format(ticker, year, end_time-start_time))
+    old_sentences = [x for x in old_sentences_complete if x['ticker'] == ticker]
+    if len(old_sentences) > 0:
+        for new_sentence in [x for x in new_sentences_complete if x['ticker'] == ticker]:
+            rows.append(compare_single_sentence(new_sentence, old_sentences))
+        logging.info("Similarities {0} complete for {1} - {2}".format(year, ticker, datetime.now()))
+    else:
+        print("No {0} sentences for {1}".format(year - 1, ticker))
+        logging.info("No {0} sentences for {1} - {2}".format(year - 1, ticker, datetime.now()))
+    end_time = time.time()
+    print('{0} - {1} complete - {2}'.format(ticker, year, end_time-start_time))
     return rows
 
 if __name__ == '__main__':
@@ -67,5 +68,7 @@ if __name__ == '__main__':
     with open(filename, 'w') as f:
         writer = csv.DictWriter(f, fieldnames=similarity_headers)
         writer.writeheader()
-        ticker_list = pull_tickers_by_year(year)
-        writer.writerows(server_run_similarities(year, ticker_list))
+        ticker_list = pull_tickers_by_year(year)[-3:]
+        #ticker_list = [{'ticker': 'ZQK'}, {'ticker': 'JNJ'}, {'ticker': 'JNJ'}]
+        for ticker in ticker_list:
+            writer.writerows(server_run_similarities(year, ticker['ticker']))
